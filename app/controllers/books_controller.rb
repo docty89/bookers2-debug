@@ -6,6 +6,7 @@ class BooksController < ApplicationController
 
   def index
     @books = Book.all
+    @book = Book.new
   end
 
   def create
@@ -30,7 +31,7 @@ class BooksController < ApplicationController
     if @book.update(book_params)
       redirect_to book_path(@book), notice: "You have updated book successfully."
     else
-      render "edit"
+      render 'edit'
     end
   end
 
@@ -43,7 +44,14 @@ class BooksController < ApplicationController
   private
 
   def book_params
-    params.require(:book).permit(:title)
+    params.require(:book).permit(:title, :body)
+  end
+  
+  def ensure_correct_user
+    book = Book.find(params[:id])
+    if book.user != current_user
+      redirect_to books_path
+    end
   end
 
 end
